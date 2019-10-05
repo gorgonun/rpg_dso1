@@ -7,8 +7,5 @@ class StartScreen(Screen):
         text = "Start menu"
         start = lambda: print("char_screen")
         create = lambda: print("Creating")
-        # menu = {"Start game": start, "Create character": create}
         menu = [("Start game", start), ("Create character", create), ("Exit", exit)]
         super().get_menu_input(text, menu)
-
-StartScreen()
