@@ -10,6 +10,13 @@ class Screen(ABC):
        self.update_terminal_size()
        return self.__columns
 
+    def get_confimation(self):
+        input("\nPress enter to continue...")
+
+    def print_wait_confimation(self, text):
+        self.print_centralized(text)
+        self.get_confimation()
+
     def get_adventure_input(self, text: str, output_dict: dict, alert: str=None) -> None:
         return self.get_input(text, output_dict, alert)
 
@@ -19,20 +26,24 @@ class Screen(ABC):
         text = text + "\n" + "\n".join(["{}. {}".format(number, option) for number, option in zip(range(1, len(output_dict.keys()) + 1), options)])
         return self.get_input(text, output_dict, alert, help=False, text_screen=text_screen)
 
-    def get_input(self, text: str, output_dict: dict, alert: str=None, help: bool=True, text_screen: str="") -> None:
+    def get_input(self, text: str, output_dict: dict, alert: str=None, help: bool=True, help_text: str="", text_screen: str="") -> None:
         try:
             self.clear_screen()
             if alert: self.print_centralized(alert, space="  ✖  ")
             if text_screen: print(text_screen)
             self.print_centralized(text + "\n")
+            if help and help_text: self.print_centralized(help_text)
             user_input = input(">> ")
             result = output_dict.get(user_input)
             if result:
-                return result()
+                args = result.get("args")
+                if args:
+                    return result["f"](*args)
+                return result["f"]()
             elif user_input == "?" and help:
-                self.print_centralized("\n► ".join(output_dict.keys()))
-                return self.get_menu_input(text, output_dict)
-            text_invalid = "Invalid input" + " Write ? to see possible options" if help else "Invalid input"
+                help_text = "► " + "\n► ".join(output_dict.keys())
+                return self.get_input(text, output_dict, help_text=help_text)
+            text_invalid = "Invalid input." + " Write ? to see possible options" if help else "Invalid input."
             return self.get_input(text, output_dict, text_invalid, help=help, text_screen=text_screen)
         except KeyboardInterrupt:
             exit()
