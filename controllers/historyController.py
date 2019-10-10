@@ -5,7 +5,7 @@ class HistoryController():
 
     def __init__(self):
         self.stage = "stage1"
-        self.placename = "florest"
+        self.placename = "forest"
         #TODO: do it in character
         self.carma = 0
         self.key_decisions = []

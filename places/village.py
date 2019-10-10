@@ -3,7 +3,7 @@ from place import Place
 class Village(Place):
 
     def __init__(self):
-        self.__full_path = "stage1 florest north"
+        self.__full_path = "stage1 forest north"
         self.__commands = ["kill bear", "go away", "push him away"]
 
     def kill_bear(self):

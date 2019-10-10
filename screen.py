@@ -29,7 +29,9 @@ class Screen(ABC):
     def get_input(self, text: str, output_dict: dict, alert: str=None, help: bool=True, help_text: str="", text_screen: str="") -> None:
         try:
             self.clear_screen()
-            if alert: self.print_centralized(alert, space="  ✖  ")
+            if alert:
+                self.print_centralized(alert, space="  ✖  ")
+                print("\n")
             if text_screen: print(text_screen)
             self.print_centralized(text + "\n")
             if help and help_text: self.print_centralized(help_text)

@@ -1,4 +1,4 @@
-from places import florest, noBearFlorest, northFlorest, village
+from places import forest, village
 from flux import flux
 from place import Place
 from screens import explorerScreen
@@ -12,28 +12,26 @@ class PlaceController():
     def __init__(self, history_controller):
         self.__flux = flux
         self.__hc = history_controller
-
         self.__path = self.__flux[self.__hc.stage]["places"][self.__hc.placename]
-        self.__place = self.get_instance(self.__hc.placename)
-        self.__text = self.__path["text"]
+        self.__place = self.get_instance(self.__hc.placename)()
+        self.__text = self.__path["data"]["introduction"]
         self.__commands = self.__place.commands
 
     def do_action(self, action: list):
-        consequences = getattr(self.__place, action)
-        if consequences:
-            for command, consequence in consequences().items():
-                if command == "move":
-                    self.__path = self.map_keys(self.__flux, consequence)
-                    self.__hc.placename = self.__path["placename"]
-                    self.__place = self.get_instance(self.__hc.placename)
-                elif command == "carma":
-                    self.__hc.carma += consequence
-                elif command == "key_deicision":
-                    self.__hc.key_decisions += consequence
-                elif command == "imediate_consequence":
-                    self.__hc.show_text(consequence)
+        consequences = getattr(self.__place, action)()
+        char_update = self.__path["data"][action]
+
+        self.__hc.carma += char_update["carma"]
+        self.__hc.show_text(self.__path["data"][action]["consequence"])
+
+        self.__path = self.map_keys(self.__flux, consequences["next_place"])
+        self.__hc.placename = self.__path["placename"]
+        place_instance = consequences.get("place_instance")
+
+        if place_instance:
+            self.__place = self.get_instance(self.__hc.placename)()
         self.__commands = self.__place.commands
-        self.__text = self.__path["text"]
+        self.__text = self.__path["data"]["introduction"]
 
     def explore(self):
         action = self.__hc.get_action(self.__text, self.__commands).replace(" ", "_")
@@ -50,8 +48,6 @@ class PlaceController():
     
     def get_instance(self, place):
         places = {
-            "florest": florest.Florest,
-            "nobear": noBearFlorest.NoBearFlorest,
-            "north": northFlorest.NorthFlorest,
+            "forest": forest.forest,
             "village": village.Village}
-        return places[place]()
+        return places[place]

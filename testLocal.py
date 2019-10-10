@@ -30,10 +30,10 @@ class Place(ABC):
         return [item for sublist in incomplete_list for item in sublist][:-1]
 
 
-class Florest(Place):
+class forest(Place):
 
     def __init__(self):
-        self.__full_path = "stage1 florest"
+        self.__full_path = "stage1 forest"
         self.__commands = ["move north", "move south"]
 
     def move_north(self):
@@ -51,7 +51,7 @@ class Florest(Place):
 class Stone(Place):
 
     def __init__(self):
-        self.__full_path = "stage1 florest stone"
+        self.__full_path = "stage1 forest stone"
         self.__commands = "kill friend"
 
     def kill_friend(self):
@@ -93,7 +93,7 @@ class PlaceControler():
         self.__flux = flux
         self.__carma = 0
         self.__stage = "stage1"
-        self.__placename = "florest"
+        self.__placename = "forest"
         self.__path = self.__flux[self.__stage]["places"][self.__placename]
         self.__place = self.get_instance(self.__placename)
         self.__text = self.__path["text"]
@@ -132,7 +132,7 @@ class PlaceControler():
         return place
     
     def get_instance(self, place):
-        places = {"florest": Florest(), "stone": Stone(), "village": Village()}
+        places = {"forest": forest(), "stone": Stone(), "village": Village()}
         return places[place]
 
 
