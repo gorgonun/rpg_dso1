@@ -1,6 +1,13 @@
 from screen import Screen
 
 class ExplorerScreen(Screen):
+    
+    def __init__(self, log):
+        self.__log = log
+
+    @property
+    def log(self):
+        return self.__log
 
     def show_text(self, text):
         super().print_wait_confimation(text)

@@ -10,3 +10,7 @@ setup:
 setup-mobile:
 	- pkg install python
 	- python -m pip install -e .
+
+run:
+	- source venv/bin/activate && \
+		python suamae.py

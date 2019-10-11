@@ -6,6 +6,11 @@ class Screen(ABC):
     __os = os.name
 
     @property
+    @abstractmethod
+    def log(self):
+        pass
+
+    @property
     def columns(self):
        self.update_terminal_size()
        return self.__columns
@@ -21,7 +26,7 @@ class Screen(ABC):
         return self.get_input(text, output_dict, alert)
 
     def get_menu_input(self, text:str, output_list: list, alert: str=None, text_screen: str= ""):
-        output_dict = {str(number): item[1] for number, item in zip(range(1, len(output_list) + 1), output_list)}
+        output_dict = {str(number): {"f": item[1]} for number, item in zip(range(1, len(output_list) + 1), output_list)}
         options = [x[0] for x in output_list]
         text = text + "\n" + "\n".join(["{}. {}".format(number, option) for number, option in zip(range(1, len(output_dict.keys()) + 1), options)])
         return self.get_input(text, output_dict, alert, help=False, text_screen=text_screen)
@@ -29,29 +34,47 @@ class Screen(ABC):
     def get_input(self, text: str, output_dict: dict, alert: str=None, help: bool=True, help_text: str="", text_screen: str="") -> None:
         try:
             self.clear_screen()
+            
             if alert:
+                self.log.info("Printing alert %s", alert)
                 self.print_centralized(alert, space="  ✖  ")
                 print("\n")
+            
             if text_screen: print(text_screen)
+            
             self.print_centralized(text + "\n")
+            
             if help and help_text: self.print_centralized(help_text)
+            
             user_input = input(">> ")
             result = output_dict.get(user_input)
+            self.log.info("Got user input %s", user_input)
+            
             if result:
                 args = result.get("args")
+                
                 if args:
+                    self.log.info("Args detected for function")
                     return result["f"](*args)
+               
+                self.log.info("Executing function without args")
                 return result["f"]()
+            
             elif user_input == "?" and help:
                 help_text = "► " + "\n► ".join(output_dict.keys())
                 return self.get_input(text, output_dict, help_text=help_text)
+            
             text_invalid = "Invalid input." + " Write ? to see possible options" if help else "Invalid input."
             return self.get_input(text, output_dict, text_invalid, help=help, text_screen=text_screen)
+        
         except KeyboardInterrupt:
+            self.log.info("User canceled operation")
             exit()
 
     def update_terminal_size(self):
+        self.log.info("Updating colum size")
         self.__columns, self.__rows = os.get_terminal_size(1)
+        self.log.info("New column info %s column, %s row", self.__columns, self.__rows)
     
     def clear_screen(self):
         if self.__os == 'nt':

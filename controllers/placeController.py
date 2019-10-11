@@ -9,9 +9,10 @@ class PlaceNotFoundException(Exception):
 
 class PlaceController():
 
-    def __init__(self, history_controller):
+    def __init__(self, main_controller, log):
         self.__flux = flux
-        self.__hc = history_controller
+        self.__log = log
+        self.__hc = main_controller
         self.__path = self.__flux[self.__hc.stage]["places"][self.__hc.placename]
         self.__place = self.get_instance(self.__hc.placename)()
         self.__text = self.__path["data"]["introduction"]
