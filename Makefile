@@ -1,10 +1,10 @@
 SHELL=/bin/bash
 
-.PHONY: setup, setup-mobile
+.PHONY: setup, setup-mobile, run
 
 setup:
-	-	virtualenv venv -p python3.6
-	- 	source venv/bin/activate && \
+	- virtualenv venv -p python3.6
+	- source venv/bin/activate && \
 			pip install -e .
 
 setup-mobile:

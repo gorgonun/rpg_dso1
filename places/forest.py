@@ -7,11 +7,13 @@ class forest(Place):
         self.__stage = "stage1"
         self.__state = self.__name
         self.__states = {
-            self.__name: {**self.format_as_state("move north", new_state="north")},
+            self.__name: self.format_as_state("move north", new_state="north"),
             "north":
-                {**self.format_as_state("kill bear", new_state="north nobear"),
-                **self.format_as_state("go away", next_place="village"),
-                **self.format_as_state("push him away")},
+                {
+                    **self.format_as_state("kill bear", new_state="north nobear"),
+                    **self.format_as_state("go away", next_place="village"),
+                    **self.format_as_state("push him away")
+                    },
             "nobear":
             {
                 **self.format_as_state("steal bag", next_place="village"),

@@ -1,13 +1,10 @@
 from controllers.placeController import PlaceController
 from controllers.screenController import ScreenController
-import logging
 
 class HistoryController():
 
-    def __init__(self):
-        self.__log = logging.getLogger("log")
-        self.__log.addHandler(logging.FileHandler("log.log", "a"))
-        self.__log.setLevel(logging.DEBUG)
+    def __init__(self, log):
+        self.__log = log
         self.stage = "stage1"
         self.placename = "forest"
         #TODO: do it in character
@@ -16,10 +13,12 @@ class HistoryController():
         self.__place_controller = PlaceController(self, self.__log)
         self.__screen_controller = ScreenController(self, self.__log)
 
-    def start_game(self):
+    def start_adventure(self):
         self.__log.info("Starting game")
-        while True:
-            self.__place_controller.explore()
+        dead = False
+        while not dead:
+            dead = self.__place_controller.explore()
+        return dead
 
     def show_text(self, text):
         self.__screen_controller.show_text(text)
@@ -27,5 +26,12 @@ class HistoryController():
     def get_action(self, text: str, commands: list):
         return self.__screen_controller.get_action(text, commands)
 
-    def start_screen(self):
-        self.__screen_controller.start_screen()
+    def start_game(self):
+        menu_option = self.__screen_controller.start_screen()
+        if menu_option == "start_game":
+            return self.start_adventure()
+
+    def death(self):
+        self.__log.info("End game")
+        # final screen
+        return 0

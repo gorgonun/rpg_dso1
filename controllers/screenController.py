@@ -16,11 +16,8 @@ class ScreenController():
         return self.__explorer_screen.get_action(text, commands)
 
     def start_screen(self):
-        self.__start_screen.start(self)
+        return self.__start_screen.start()
 
     def create_character(self):
         pass
-    
-    def start_game(self):
-        self.__log.info("Got signal to start game")
-        self.__main_controller.start_game()
+

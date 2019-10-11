@@ -17,7 +17,7 @@ history = {
         "As you come closer, you find a woman laying on a stone, with a full bag in her left. In her right, distant by some metters, there is a bear slowing going away.",
         kill_bear=as_consequence_dict("you take an arrow in your pouch and, with your ranger skill, kill the bear with one arrow in his head", carma=-1),
         go_away=as_consequence_dict("You go away, trying to not be envolved in problems. You go to the village.", carma=-1),
-        push_him=as_consequence_dict("You try to push the bear away screaming with him and throwing stones in his direction. He goes away. In your back you hear a bear roar. When you turn, you feel your skin being ripped away. You're dead.", dead=True),
+        push_him_away=as_consequence_dict("You try to push the bear away screaming with him and throwing stones in his direction. He goes away. In your back you hear a bear roar. When you turn, you feel your skin being ripped away. You're dead.", dead=True),
     ),
     **as_history_dict(
         "stage1 forest north nobear",

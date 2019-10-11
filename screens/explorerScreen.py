@@ -10,7 +10,7 @@ class ExplorerScreen(Screen):
         return self.__log
 
     def show_text(self, text):
-        super().print_wait_confimation(text)
+        self.print_wait_confimation(text)
 
     def get_action(self, text:str, commands: list):
         output_dict = {
@@ -20,4 +20,4 @@ class ExplorerScreen(Screen):
             }
              for key in commands
              }
-        return super().get_adventure_input(text, output_dict)
+        return self.get_adventure_input(text, output_dict)

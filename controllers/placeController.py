@@ -22,6 +22,12 @@ class PlaceController():
         consequences = getattr(self.__place, action)()
         char_update = self.__path["data"][action]
 
+        self.__log.info("Start doing action %s", action)
+
+        if self.__path["data"][action]["dead"]:
+            self.__log.info("Character dead")
+            return self.__hc.death()
+
         self.__hc.carma += char_update["carma"]
         self.__hc.show_text(self.__path["data"][action]["consequence"])
 
@@ -30,13 +36,16 @@ class PlaceController():
         place_instance = consequences.get("place_instance")
 
         if place_instance:
+            self.__log.info("New place instance: %s", self.__hc.placename)
             self.__place = self.get_instance(self.__hc.placename)()
+
         self.__commands = self.__place.commands
         self.__text = self.__path["data"]["introduction"]
 
     def explore(self):
         action = self.__hc.get_action(self.__text, self.__commands).replace(" ", "_")
-        self.do_action(action)
+        self.__log.info("Got action %s", action)
+        return self.do_action(action)
 
     def map_keys(self, original_dict: dict, list_map: list):
         place = original_dict
