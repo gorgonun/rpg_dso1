@@ -4,13 +4,12 @@ class forest(Place):
 
     def __init__(self):
         self.__name = "forest"
-        self.__stage = "stage1"
-        self.__state = self.__name
+        self.__state = [self.__name]
         self.__states = {
-            self.__name: self.format_as_state("move north", new_state="north"),
+            self.__name: self.format_as_state("move north", new_state=["north"]),
             "north":
                 {
-                    **self.format_as_state("kill bear", new_state="north nobear"),
+                    **self.format_as_state("kill bear", new_state=["north", "nobear"]),
                     **self.format_as_state("go away", next_place="village"),
                     **self.format_as_state("push him away")
                     },
@@ -40,16 +39,12 @@ class forest(Place):
         return self.alter_state("help woman")
 
     @property
-    def stage(self):
-         return self.__stage
-
-    @property
     def name(self):
         return self.__name
 
     @property
     def state(self):
-        return self.__state.split(" ")[-1]
+        return self.__state[-1]
 
     @state.setter
     def state(self, new_state: str):

@@ -14,3 +14,5 @@ if __name__ == "__main__":
         if result != 1:
             log.info("Exiting")
             exit()
+        else:
+            log.info("asfjk")

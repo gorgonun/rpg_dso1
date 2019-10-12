@@ -13,7 +13,7 @@ class Place(ABC):
 
     @property
     def full_path(self):
-        return self.root + " " + self.complete_state
+        return self.complete_state
 
     @property
     @abstractmethod
@@ -36,27 +36,23 @@ class Place(ABC):
         pass
 
     @property
-    def root(self):
-        return self.stage
-
-    @property
     def top(self):
-        return self.as_list(self.full_path)[-1]
+        return self.map_state(self.full_path)[-1]
 
-    def as_list(self, string: str):
-        incomplete_list = list(map(lambda x: [x, "places"], string.split(" ")))
+    def map_state(self, states: list):
+        incomplete_list = list(map(lambda x: [x, "places"], states))
         return [item for sublist in incomplete_list for item in sublist][:-1]
     
-    def format_as_state(self, command: str, new_state: str="end", next_place: str=None):
+    def format_as_state(self, command: str, new_state: list=[], next_place: str=None):
         return {
             command: {
                 "state": new_state,
-                "next_place": self.as_list(self.root + " " + next_place) if next_place else self.as_list(self.full_path + " " + new_state),
+                "next_place": self.map_state(next_place) if next_place else self.map_state(self.full_path + new_state),
                 "place_instance": next_place
                 }
         }
 
     def alter_state(self, command: str):
-        old_state =  self.states[self.state][command]
-        self.state = self.complete_state + " " + self.states[self.state][command]["state"]
+        old_state = self.states[self.state][command]
+        self.state = self.complete_state + self.states[self.state][command]["state"]
         return old_state

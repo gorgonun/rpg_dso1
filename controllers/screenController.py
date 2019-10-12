@@ -15,8 +15,8 @@ class ScreenController():
     def get_action(self, text: str, commands: list):
         return self.__explorer_screen.get_action(text, commands)
 
-    def start_screen(self):
-        return self.__start_screen.start()
+    def start_screen(self, text, menu):
+        return self.__start_screen.start(text, menu)
 
     def create_character(self):
         pass
