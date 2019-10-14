@@ -14,3 +14,7 @@ setup-mobile:
 run:
 	- source venv/bin/activate && \
 		python suamae.py
+
+run-test:
+	-source venv/bin/activate && \
+		python suamae.py test

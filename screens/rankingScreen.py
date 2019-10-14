@@ -2,7 +2,7 @@ from screen import Screen
 from datetime import datetime
 
 class RankingScreen(Screen):
-    
+
     def __init__(self, log):
         self.__log = log
 
@@ -12,20 +12,31 @@ class RankingScreen(Screen):
 
     def show_ranking(self, player_dict: dict):
         title = "Ranking"
-        template = "|{:<30}|{:<26}|{:^30}|"
-        menu = [("Exit", lambda: 0)]
+        template = "{:<20}|{:<30}|{:<26}|{:^30}"
         lines = []
         for key in player_dict.keys():
-            lines.append(template.format(key, str(player_dict[key]["date"]), " ".join(player_dict[key]["key_decisions"][0])))
-            for key_decision in player_dict[key]["key_decisions"][1:]:
-                lines.append(template.format("", "", " ".join(key_decision)))
-        formated_top = super().format_centralized(title, "-")
+            for character in player_dict[key]:
+                key_decision = "" if not character.key_decisions else character.key_decisions[0]
+                lines.append(template.format(key, character.name, str(character.time_played), key_decision))
+                for key_decision in character.key_decisions[1:]:
+                    lines.append(template.format("↳", "", "", key_decision))
+        formated_top = self.format_centralized(title, "-")
         formated_template = "\n".join(lines)
-        formated_bottom = super().format_centralized("", '-')
+        formated_bottom = self.format_centralized("", '-')
         formated_screen = "{}\n{}\n{}\n".format(formated_top, formated_template, formated_bottom)
-        return super().get_menu_input("", menu, text_screen=formated_screen)
+        return self.print_wait_confimation(formated_screen)
 
-RankingScreen().show_ranking({
-    "jose": {"date": datetime.now(), "key_decisions": [("thief", "woman"), ("kill", "friend")]},
-    "jose1": {"date": datetime.now(), "key_decisions": [("thief", "woman"), ("kill", "friend")]}
-})
+
+
+# class a:
+
+#     def __init__(self, name, date, c):
+#         self.name = name
+#         self.played_time = date
+#         self.key_decisions = c
+
+# RankingScreen(None).show_ranking({
+#     "jose": [a("mario", datetime.now(), [("thief woman")])],
+#     "jose1": [a("julio", datetime.now(), [("thief woman"), ("kill friend")]),
+#             a("marco", datetime.now(), [("thief woman"), ("kill friend")])]
+# })

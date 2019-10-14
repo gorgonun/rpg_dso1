@@ -1,5 +1,7 @@
 from screens.startScreen import StartScreen
 from screens.explorerScreen import ExplorerScreen
+from screens.characterCreationScreen import CharacterCreationScreen
+from screens.rankingScreen import RankingScreen
 
 class ScreenController():
 
@@ -7,6 +9,8 @@ class ScreenController():
         self.__log = log
         self.__explorer_screen = ExplorerScreen(log)
         self.__start_screen = StartScreen(log)
+        self.__character_creation_screen = CharacterCreationScreen(self, log)
+        self.__ranking_screen = RankingScreen(log)
         self.__main_controller = main_controller
 
     def show_text(self, text: str):
@@ -18,6 +22,35 @@ class ScreenController():
     def start_screen(self, text, menu):
         return self.__start_screen.start(text, menu)
 
-    def create_character(self):
-        pass
+    def create_character_screen(self):
+        return self.__character_creation_screen.create_character()
 
+    def create_character(self, player_name: str, player_age: int, char_name: str):
+        return self.__main_controller.create_character(player_name=player_name, player_age=player_age, char_name=char_name)
+
+    def list_created(self, players):
+        return self.__character_creation_screen.list_created(players)
+
+    def create_select_screen(self):
+        return self.__character_creation_screen.create_select()
+
+    def check_if_exists_player(self, name):
+        return self.__main_controller.check_if_exists_player(name)
+
+    def check_if_exists_char(self, player_name: str, char_name: str):
+        return self.__main_controller.check_if_exists_char(player_name=player_name, char_name=char_name)
+
+    def select(self, player_name: str, char_name: str):
+        return self.__main_controller.select(player_name=player_name, char_name=char_name)
+
+    def update_player(self, old_name: str, new_name: str, new_age: int):
+        return self.__main_controller.update_player(old_name, new_name, new_age)
+
+    def remove_player(self, name):
+        return self.__main_controller.remove_player(name)
+
+    def edit(self):
+        return self.__character_creation_screen.edit()
+
+    def show_ranking(self, players_dict: dict):
+        return self.__ranking_screen.show_ranking(players_dict)

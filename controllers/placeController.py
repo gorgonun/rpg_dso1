@@ -19,6 +19,10 @@ class PlaceController():
     @property
     def text(self):
         return self.__path["data"]["introduction"]
+    
+    def reset(self):
+        self.__path = self.__flux[self.__main_controller.placename]
+        self.__place = self.get_instance(self.__main_controller.placename)()
 
     def do_action(self, action: str):
         consequences = getattr(self.__place, action)()
@@ -26,7 +30,7 @@ class PlaceController():
 
         self.__log.info("Start doing action %s", action)
 
-        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=self.__path["placename"], transiction_text=char_update["consequence"])
+        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=consequences["place_instance"], transition_text=char_update["consequence"], key_decision=char_update["key_decision"])
 
         self.__path = self.map_keys(self.__flux, consequences["next_place"])
         place_instance = consequences.get("place_instance")
@@ -43,7 +47,6 @@ class PlaceController():
     def map_keys(self, original_dict: dict, list_map: list):
         place = original_dict
         for key in list_map:
-            print(key, original_dict)
             next = place.get(key)
             if not next:
                 raise PlaceNotFoundException

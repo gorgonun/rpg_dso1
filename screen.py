@@ -1,4 +1,6 @@
 import os
+import re
+from typing import Callable, Type
 from abc import ABC, abstractmethod
 
 class Screen(ABC):
@@ -31,45 +33,57 @@ class Screen(ABC):
         text = text + "\n" + "\n".join(["{}. {}".format(number, option) for number, option in zip(range(1, len(output_dict.keys()) + 1), options)])
         return self.get_input(text, output_dict, alert, help=False, text_screen=text_screen)
 
-    def get_input(self, text: str, output_dict: dict, alert: str=None, help: bool=True, help_text: str="", text_screen: str="") -> None:
-        try:
-            self.clear_screen()
-            
-            if alert:
-                self.log.info("Printing alert %s", alert)
-                self.print_centralized(alert, space="  ✖  ")
-                print("\n")
-            
-            if text_screen: print(text_screen)
-            
-            self.print_centralized(text + "\n")
-            
-            if help and help_text: self.print_centralized(help_text)
-            
-            user_input = input(">> ")
-            result = output_dict.get(user_input)
-            self.log.info("Got user input %s", user_input)
-            
-            if result:
-                args = result.get("args")
-                
-                if args:
-                    self.log.info("Args detected for function")
-                    return result["f"](*args)
-               
-                self.log.info("Executing function without args")
-                return result["f"]()
-            
-            elif user_input == "?" and help:
-                help_text = "► " + "\n► ".join(output_dict.keys())
-                return self.get_input(text, output_dict, help_text=help_text)
-            
-            text_invalid = "Invalid input." + " Write ? to see possible options" if help else "Invalid input."
-            return self.get_input(text, output_dict, text_invalid, help=help, text_screen=text_screen)
+    def get_input(self, text: str, output_dict: dict=None, validation_function: Callable[[str], bool]=None, alert: str=None, help: bool=True, help_text: str="", text_screen: str="") -> None:
+        self.clear_screen()
         
-        except KeyboardInterrupt:
-            self.log.info("User canceled operation")
-            exit()
+        if alert:
+            self.log.info("Printing alert %s", alert)
+            self.print_centralized(alert, space="  ✖  ")
+            print("\n")
+        
+        if text_screen: print(text_screen)
+        
+        self.print_centralized(text + "\n")
+        
+        if help and help_text: self.print_centralized(help_text)
+        
+        user_input = input(">> ")
+        self.log.info("Got user input %s", user_input)
+        
+        if not validation_function:
+            result = output_dict.get(user_input)
+        else:
+            result = validation_function(user_input)
+        
+        if result and output_dict:
+            return self.get_input_result(result)
+        elif result:
+            return user_input
+        
+        elif user_input == "?" and help:
+            help_text = "► " + "\n► ".join(output_dict.keys())
+            return self.get_input(text, output_dict, help_text=help_text)
+        
+        text_invalid = "Invalid input." + " Write ? to see possible options" if help else "Invalid input."
+        return self.get_input(text=text, output_dict=output_dict, validation_function=validation_function, alert=text_invalid, help=help, text_screen=text_screen)
+
+    def get_input_result(self, result_dic: dict=None, ):
+        args = result_dic.get("args")
+
+        if args:
+            self.log.info("Args detected for function")
+            return result_dic["f"](*args)
+        
+        self.log.info("Executing function without args")
+        return result_dic["f"]()
+
+    def get_variable_input(self, text: str, type_input: Type):
+        if type_input == str:
+            pattern = re.compile("[a-zA-Z0-9_]*")
+        elif type_input == int:
+            pattern = re.compile("\d+")
+        validation_function = lambda x: pattern.fullmatch(x)
+        return self.get_input(text, validation_function=validation_function, help=False)
 
     def update_terminal_size(self):
         self.log.info("Updating colum size")
@@ -77,6 +91,7 @@ class Screen(ABC):
         self.log.info("New column info %s column, %s row", self.__columns, self.__rows)
     
     def clear_screen(self):
+        return
         if self.__os == 'nt':
             os.system('cls')
         else:

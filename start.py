@@ -1,4 +1,5 @@
 from controllers.historyController import HistoryController
+import sys
 import logging
 
 if __name__ == "__main__":
@@ -8,11 +9,14 @@ if __name__ == "__main__":
 
     history = HistoryController(log)
 
+    if len(sys.argv) == 2 and sys.argv[1] == "test":
+        history.test_mode()
+
     while True:
         log.info("Starting game")
-        result = history.start_game()
-        if result != 1:
-            log.info("Exiting")
-            exit()
-        else:
-            log.info("asfjk")
+
+        try:
+            history.start_game()
+
+        except KeyboardInterrupt:
+            log.info("User canceled operation")
