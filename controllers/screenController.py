@@ -37,10 +37,6 @@ class ScreenController():
     def check_if_exists_char(self, player_name: str, char_name: str):
         return self.__main_controller.check_if_exists_char(player_name=player_name, char_name=char_name)
 
-    # def select(self, player_name: str, char_name: str):
-        # return player_name, char_name
-        # return self.__main_controller.select(player_name=player_name, char_name=char_name)
-
     def update_player(self, old_name: str, new_name: str, new_age: int):
         return self.__main_controller.update_player(old_name, new_name, new_age)
 

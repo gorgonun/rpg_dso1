@@ -41,7 +41,6 @@ class CharacterCreationScreen(Screen):
             char_name = self.get_variable_input("Char name", str)
             if self.__main_controller.check_if_exists_char(player_name=name, char_name=char_name):
                 return name, char_name
-                # return self.__main_controller.select(player_name=name, char_name=char_name)
 
     def edit(self):
         name = self.get_variable_input("Player name", str)

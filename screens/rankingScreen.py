@@ -25,18 +25,3 @@ class RankingScreen(Screen):
         formated_bottom = self.format_centralized("", '-')
         formated_screen = "{}\n{}\n{}\n".format(formated_top, formated_template, formated_bottom)
         return self.print_wait_confimation(formated_screen)
-
-
-
-# class a:
-
-#     def __init__(self, name, date, c):
-#         self.name = name
-#         self.played_time = date
-#         self.key_decisions = c
-
-# RankingScreen(None).show_ranking({
-#     "jose": [a("mario", datetime.now(), [("thief woman")])],
-#     "jose1": [a("julio", datetime.now(), [("thief woman"), ("kill friend")]),
-#             a("marco", datetime.now(), [("thief woman"), ("kill friend")])]
-# })
