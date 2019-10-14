@@ -1,3 +1,3 @@
 from setuptools import setup, find_packages
 
-setup(name='anomRgp', version='1.0', packages=find_packages())
+setup(name='AnomRgp', version='1.0', packages=find_packages())

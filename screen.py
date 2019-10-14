@@ -91,7 +91,6 @@ class Screen(ABC):
         self.log.info("New column info %s column, %s row", self.__columns, self.__rows)
     
     def clear_screen(self):
-        return
         if self.__os == 'nt':
             os.system('cls')
         else:
