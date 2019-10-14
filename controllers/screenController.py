@@ -22,11 +22,8 @@ class ScreenController():
     def start_screen(self, text, menu):
         return self.__start_screen.start(text, menu)
 
-    def create_character_screen(self):
+    def create_character(self):
         return self.__character_creation_screen.create_character()
-
-    def create_character(self, player_name: str, player_age: int, char_name: str):
-        return self.__main_controller.create_character(player_name=player_name, player_age=player_age, char_name=char_name)
 
     def list_created(self, players):
         return self.__character_creation_screen.list_created(players)
@@ -40,8 +37,9 @@ class ScreenController():
     def check_if_exists_char(self, player_name: str, char_name: str):
         return self.__main_controller.check_if_exists_char(player_name=player_name, char_name=char_name)
 
-    def select(self, player_name: str, char_name: str):
-        return self.__main_controller.select(player_name=player_name, char_name=char_name)
+    # def select(self, player_name: str, char_name: str):
+        # return player_name, char_name
+        # return self.__main_controller.select(player_name=player_name, char_name=char_name)
 
     def update_player(self, old_name: str, new_name: str, new_age: int):
         return self.__main_controller.update_player(old_name, new_name, new_age)

@@ -1,6 +1,6 @@
 from place import Place
 
-class forest(Place):
+class Forest(Place):
 
     def __init__(self):
         self.__name = "forest"

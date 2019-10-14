@@ -47,7 +47,7 @@ class Place(ABC):
         return {
             command: {
                 "state": new_state,
-                "next_place": self.map_state(next_place) if next_place else self.map_state(self.full_path + new_state),
+                "next_place": self.map_state([next_place]) if next_place else self.map_state(self.full_path + new_state),
                 "place_instance": next_place
                 }
         }

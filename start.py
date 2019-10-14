@@ -16,7 +16,15 @@ if __name__ == "__main__":
         log.info("Starting game")
 
         try:
-            history.start_game()
+            result = history.start_game()
 
         except KeyboardInterrupt:
             log.info("User canceled operation")
+            result = -1
+
+        except Exception as e:
+            log.info("Got unexpected exception: %s. Could not recover.", e)
+            result = 1
+
+        if result == 0:
+            break

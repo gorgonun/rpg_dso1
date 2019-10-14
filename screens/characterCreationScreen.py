@@ -1,8 +1,9 @@
 from screen import Screen
+from logging import Logger
 
 class CharacterCreationScreen(Screen):
 
-    def __init__(self, main_controller, log):
+    def __init__(self, main_controller, log: Logger):
         self.__main_controller = main_controller
         self.__log = log
 
@@ -11,15 +12,11 @@ class CharacterCreationScreen(Screen):
         return self.__log
 
     def create_character(self):
-        while True:
-            self.print_centralized("Creating new character")
-            name = self.get_variable_input("Player name", str)
-            age = int(self.get_variable_input("Age", int))
-            char_name = self.get_variable_input("Char name", str)
-            player = self.__main_controller.create_character(player_name=name, player_age=age, char_name=char_name)
-            if player:
-                return player
-            self.print_wait_confimation("Could not create your player.")
+        self.print_centralized("Creating new character")
+        name = self.get_variable_input("Player name", str)
+        age = int(self.get_variable_input("Age", int))
+        char_name = self.get_variable_input("Char name", str)
+        return name, age, char_name
 
     def list_created(self, players: list):
         template = "{:<20}|{:<3}|{:<10}|{:>20}s"
@@ -43,7 +40,8 @@ class CharacterCreationScreen(Screen):
         if self.__main_controller.check_if_exists_player(name):
             char_name = self.get_variable_input("Char name", str)
             if self.__main_controller.check_if_exists_char(player_name=name, char_name=char_name):
-                return self.__main_controller.select(player_name=name, char_name=char_name)
+                return name, char_name
+                # return self.__main_controller.select(player_name=name, char_name=char_name)
 
     def edit(self):
         name = self.get_variable_input("Player name", str)

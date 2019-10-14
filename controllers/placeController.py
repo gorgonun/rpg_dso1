@@ -2,6 +2,7 @@ from places import forest, village
 from flux import flux
 from place import Place
 from screens import explorerScreen
+from logging import Logger
 
 class PlaceNotFoundException(Exception):
     pass
@@ -9,7 +10,7 @@ class PlaceNotFoundException(Exception):
 
 class PlaceController():
 
-    def __init__(self, main_controller, log):
+    def __init__(self, main_controller, log: Logger):
         self.__flux = flux
         self.__log = log
         self.__main_controller = main_controller
@@ -49,12 +50,12 @@ class PlaceController():
         for key in list_map:
             next = place.get(key)
             if not next:
-                raise PlaceNotFoundException
+                raise PlaceNotFoundException("Key {} not found in flux".format(key))
             place = next
         return place
     
-    def get_instance(self, place):
+    def get_instance(self, place: str):
         places = {
-            "forest": forest.forest,
+            "forest": forest.Forest,
             "village": village.Village}
         return places[place]

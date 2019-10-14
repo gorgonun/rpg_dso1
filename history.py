@@ -27,7 +27,7 @@ history = {
     ),
     **as_history_dict(
         "village",
-        "You try to ",
-        move=as_consequence_dict("a")
+        "You see your village destructed and your father in the ground, probably dead.",
+        walk_away=as_consequence_dict("When you try to walk away, an arrow get you in the belly. You are dead", key_decision="walk away", dead=True)
     )
 }
