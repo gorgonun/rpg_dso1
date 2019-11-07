@@ -35,3 +35,9 @@ class Player:
 
     def character(self, name):
         return self.__characters.get(name)
+
+    def __len__(self):
+        return len(self.__name)
+
+    def __str__(self):
+        return self.__name

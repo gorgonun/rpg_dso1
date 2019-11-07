@@ -13,6 +13,7 @@ class HistoryController:
         self.__place_controller = PlaceController(self, self.__log)
         self.__screen_controller = ScreenController(self, self.__log)
         self.__player_controller = PlayerController(self, self.__log)
+        self.__screen = ["main_character_screen"]
 
     @property
     def placename(self):
@@ -24,27 +25,58 @@ class HistoryController:
             self.__log.info("History place changed to %s", placename)
             self.__placename = placename
 
-    def start_game(self):
-        self.__log.info("Starting menu")
-        text = "Start menu\n"
-        start = lambda: self.start_adventure()
-        create = lambda: self.create_character()
-        list_created = lambda: self.list_created()
-        ranking = lambda: self.show_ranking()
-        edit = lambda: self.edit()
-        exit_f = lambda: "exit"
-        menu = [("Start game", start), ("Create character", create)]
-        
-        if self.__player_controller.has_players:
-            menu.append(("List players created", list_created))
-            menu.append(("Edit players", edit))
-            menu.append(("Show ranking", ranking))
+    @property
+    def screen(self):
+        if len(self.__screen) > 0:
+            return self.__screen[0]
+        return self.__screen
 
-        menu.append(("Exit", exit_f))
-        result = self.__screen_controller.start_screen(text, menu)
+    @screen.setter
+    def screen(self, next):
+        if next not in self.__screen:
+            self.__screen.append(next)
 
-        if result == "exit":
+    def back(self):
+        self.__screen = self.__screen[:-1]
+
+    def screen_manager(self):
+        if len(self.__screen) == 0:
             return 0
+        elif self.screen == "main_character_screen":
+            self.main_character_screen()
+            self.screen_manager()
+
+    def start_game(self):
+        return self.screen_manager()
+        # self.__log.info("Starting menu")
+        # text = "Start menu\n"
+        # start = lambda: self.start_adventure()
+        # create = lambda: self.create_character()
+        # list_created = lambda: self.list_created()
+        # ranking = lambda: self.show_ranking()
+        # edit = lambda: self.edit()
+        # exit_f = lambda: "exit"
+        # menu = [("Start game", start), ("Create character", create)]
+        
+        # if self.__player_controller.has_players:
+        #     menu.append(("List players created", list_created))
+        #     menu.append(("Edit players", edit))
+        #     menu.append(("Show ranking", ranking))
+
+        # menu.append(("Exit", exit_f))
+        # result = self.__screen_controller.start_screen(text, menu)
+
+        # if result == "exit":
+        #     return 0
+
+    def main_character_screen(self):
+        self.screen = "main_character_screen"
+        players = self.__player_controller.players
+        return self.__screen_controller.main_character_screen(players, self.__player, self.__character)
+
+    def select(self, player, char):
+        self.__player = player
+        self.__character = char
 
     def create_select_screen(self):
         result = self.__screen_controller.create_select_screen()
@@ -72,21 +104,19 @@ class HistoryController:
             self.__place_controller.explore()
         self.death()
 
-    def create_character(self):
-        result = self.__screen_controller.create_character()
-        player = self.__player_controller.create_character(player_name=result[0], player_age=result[1], char_name=result[2])
-        
-        if player:
-            self.__character = player.character(result[2])
-            self.__player = player
-        
-        else:
-            self.show_text("Could not create your player/character.")
+    def create_character(self, player_name: str, player_age: int, char_name: str):
+        player = self.__player_controller.create_character(player_name=player_name, player_age=player_age, char_name=char_name)
 
-    def list_created(self):
-        self.__log.info("Showing created characters")
-        players = self.__player_controller.players
-        self.__screen_controller.list_created(players)
+        if player:
+            self.__character = player.character(char_name)
+            self.__player = player
+            return player
+
+
+    # def list_created(self):
+    #     self.__log.info("Showing created characters")
+    #     players = self.__player_controller.players
+    #     self.__screen_controller.list_created(players)
 
     def edit(self):
         self.__log.info("At edit screen")
@@ -112,10 +142,10 @@ class HistoryController:
         if key_decision:
             self.__character.key_decisions = key_decision
 
-    def check_if_exists_player(self, name: str):
+    def is_valid_player(self, name: str):
         return self.__player_controller.exists_player(name)
 
-    def check_if_exists_char(self, player_name: str, char_name:str):
+    def is_valid_char(self, player_name: str, char_name:str):
         return self.__player_controller.exists_character(player_name=player_name, char_name=char_name)
     
     def update_player(self, old_name: str, new_name: str, new_age: str):

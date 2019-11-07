@@ -45,3 +45,9 @@ class Character:
         self.__carma = 0
         self.__time_played = datetime.datetime.now()
         self.__key_decisions = []
+
+    def __len__(self):
+        return len(self.__name)
+
+    def __str__(self):
+        return self.__name

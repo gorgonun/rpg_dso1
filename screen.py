@@ -2,10 +2,23 @@ import os
 import re
 from typing import Callable, Type
 from abc import ABC, abstractmethod
+import tkinter as tk
 
 class Screen(ABC):
-    __columns, __rows = os.get_terminal_size(1)
+    __root = tk.Tk()
     __os = os.name
+
+    @abstractmethod
+    def __init__(self):
+        pass
+
+    @property
+    def screen_configs(self):
+        return {
+            "no_titlebar": True,
+            "location": (0,0),
+            "size": (self.columns, self.rows)
+            }
 
     @property
     @abstractmethod
@@ -14,8 +27,11 @@ class Screen(ABC):
 
     @property
     def columns(self):
-       self.update_terminal_size()
-       return self.__columns
+       return self.__root.winfo_screenwidth()
+
+    @property
+    def rows(self):
+        return self.__root.winfo_screenheight()
 
     def get_confimation(self):
         input("\nPress enter to continue...")
@@ -67,7 +83,7 @@ class Screen(ABC):
         text_invalid = "Invalid input." + " Write ? to see possible options" if help else "Invalid input."
         return self.get_input(text=text, output_dict=output_dict, validation_function=validation_function, alert=text_invalid, help=help, text_screen=text_screen)
 
-    def get_input_result(self, result_dic: dict=None, ):
+    def get_input_result(self, result_dic: dict=None):
         args = result_dic.get("args")
 
         if args:
@@ -77,18 +93,11 @@ class Screen(ABC):
         self.log.info("Executing function without args")
         return result_dic["f"]()
 
-    def get_variable_input(self, text: str, type_input: Type):
-        if type_input == str:
-            pattern = re.compile("[a-zA-Z0-9_]*")
-        elif type_input == int:
-            pattern = re.compile("\d+")
-        validation_function = lambda x: pattern.fullmatch(x)
-        return self.get_input(text, validation_function=validation_function, help=False)
+    def validate_text(self, text: str, allow_empty: bool=False):
+        return (allow_empty or len(text) > 0) and re.compile("[a-zA-Z0-9_]*").fullmatch(text)
 
-    def update_terminal_size(self):
-        self.log.info("Updating colum size")
-        self.__columns, self.__rows = os.get_terminal_size(1)
-        self.log.info("New column info %s column, %s row", self.__columns, self.__rows)
+    def validate_number(self, number: int):
+        return re.compile("\d+").fullmatch(number)
     
     def clear_screen(self):
         if self.__os == 'nt':
@@ -104,7 +113,24 @@ class Screen(ABC):
         text_list = [(line, len(line)) for line in text.split("\n")]
         result_list = []
         for line, length in text_list:
-            columns = self.__columns - length
+            columns = self.columns - length
             spaces = space * int(int(columns / 2) / len(space))
             result_list.append("{0}{1}{0}".format(spaces, line))
         return "\n".join(result_list)
+
+    def get_variable_input(self, text: str, type_input: Type):
+        if type_input == str:
+            pattern = re.compile("[a-zA-Z0-9_]*")
+        elif type_input == int:
+            pattern = re.compile("\d+")
+        validation_function = lambda x: pattern.fullmatch(x)
+        return self.get_input(text, validation_function=validation_function, help=False)
+
+    def execute_screen(self, func_screen, screen):
+        keep = True
+        result = None
+        while keep:
+            execution = func_screen(screen)
+            keep, result = execution if execution else (True, None)
+        screen.Close()
+        return result

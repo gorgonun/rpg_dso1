@@ -25,6 +25,7 @@ if __name__ == "__main__":
         except Exception as e:
             log.info("Got unexpected exception: %s. Could not recover.", e)
             result = 1
+            raise
 
         if result == 0:
             break

@@ -1,7 +1,8 @@
 from screens.startScreen import StartScreen
 from screens.explorerScreen import ExplorerScreen
-from screens.characterCreationScreen import CharacterCreationScreen
+from screens.characterScreen import CharacterScreen
 from screens.rankingScreen import RankingScreen
+from screens.createCharacterScreen import CreateCharacterScreen
 
 class ScreenController():
 
@@ -9,8 +10,9 @@ class ScreenController():
         self.__log = log
         self.__explorer_screen = ExplorerScreen(log)
         self.__start_screen = StartScreen(log)
-        self.__character_creation_screen = CharacterCreationScreen(self, log)
+        self.__character_creation_screen = CharacterScreen(self, log)
         self.__ranking_screen = RankingScreen(log)
+        self.__create_character_screen = CreateCharacterScreen(log)
         self.__main_controller = main_controller
 
     def show_text(self, text: str):
@@ -22,20 +24,27 @@ class ScreenController():
     def start_screen(self, text, menu):
         return self.__start_screen.start(text, menu)
 
-    def create_character(self):
-        return self.__character_creation_screen.create_character()
+    def main_character_screen(self, players: list, player, character):
+        result = self.__character_creation_screen.start(players, player, character)
+        if result is None:
+            self.__main_controller.back()
+        elif result["option"] == "Create":
+            return self.create_character()
+        elif result["option"] == "Select":
+            self.__main_controller.select(result["values"]["player"], result["values"]["char"])
 
-    def list_created(self, players):
-        return self.__character_creation_screen.list_created(players)
+    def create_character(self):
+        char = self.__create_character_screen.start()
+        return self.__main_controller.create_character(**char)
 
     def create_select_screen(self):
         return self.__character_creation_screen.create_select()
 
-    def check_if_exists_player(self, name):
-        return self.__main_controller.check_if_exists_player(name)
+    def is_valid_player(self, name):
+        return self.__main_controller.is_valid_player(name)
 
-    def check_if_exists_char(self, player_name: str, char_name: str):
-        return self.__main_controller.check_if_exists_char(player_name=player_name, char_name=char_name)
+    def is_valid_char(self, player_name: str, char_name: str):
+        return self.__main_controller.is_valid_char(player_name=player_name, char_name=char_name)
 
     def update_player(self, old_name: str, new_name: str, new_age: int):
         return self.__main_controller.update_player(old_name, new_name, new_age)

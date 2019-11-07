@@ -13,12 +13,15 @@ def validate(number):
 def validate_text(text):
     return True if len(text) > 0 else False
 
+def validate_list(item, list):
+    return item in list
+
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
 layout = [
     [sg.Text("Players")],
-    [sg.Listbox(values=("Player1", "Player2", "Player3"), enable_events=True, key="player", size=(20, 20)), sg.Listbox(values=("frf"), enable_events=True, key="char")],
+    [sg.Listbox(values=(["hsa"]), enable_events=True, key="player", size=(20, 20)), sg.Listbox(values=("f", "g"), enable_events=True, key="char", size=(20, 20))],
     [sg.Button('Select'), sg.Button('Create'), sg.Button('Edit'), sg.Button('Remove'), sg.Button('Exit')]
 ]
 
@@ -43,21 +46,28 @@ while True:
     elif event == "Create":
         creation_window = sg.Window("Create a character", layout=create_char_layout, no_titlebar=True, location=(0,0), size=(screen_width,screen_height)).Finalize()
         creation_window.Maximize()
-        event, values = creation_window.Read()
-        if event == "Submit":
-            if not validate_text(values["name"]):
-                creation_window.Element("name").SetFocus()
-            elif not validate(values["age"]):
-                creation_window.Element("age").SetFocus()
-            elif not validate_text(values["char_name"]):
-                creation_window.Element("char_name").SetFocus()
-            else:
-                print(values)
+        while True:
+            event, values = creation_window.Read()
+            if event == "Submit":
+                if not validate_text(values["name"]):
+                    creation_window.Element("name").SetFocus()
+                elif not validate(values["age"]):
+                    creation_window.Element("age").SetFocus()
+                elif not validate_text(values["char_name"]):
+                    creation_window.Element("char_name").SetFocus()
+                else:
+                    print(values)
+                    creation_window.Close()
+                    break
+            elif event == "age":
+                if not validate(values["age"][-1]):
+                    creation_window.FindElement("age").Update(values["age"][:-1])
+            elif event in (None, "Cancel"):
                 creation_window.Close()
-        else:
-            print(event)
+                break
     elif event == 'Select':
-        print(values)
+        if not validate_list(values["char"], ["f"]):
+            window.Element("char").SetFocus()
 
 
 window.Close()
