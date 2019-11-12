@@ -39,6 +39,11 @@ class PlayerController:
     def remove_player(self, name):
         self.__players.pop(name)
 
+    def remove_char(self, player, char):
+        self.__players.get(player.name)["characters"].remove(char)
+        if len( self.__players.get(player.name)["characters"]) == 0:
+            self.remove_player(player.name)
+
     def exists_player(self, name):
         self.__log.info("Checking if player %s exists", name)
         return self.__players.get(name, False)

@@ -13,7 +13,6 @@ class HistoryController:
         self.__place_controller = PlaceController(self, self.__log)
         self.__screen_controller = ScreenController(self, self.__log)
         self.__player_controller = PlayerController(self, self.__log)
-        self.__screen = ["main_character_screen"]
 
     @property
     def placename(self):
@@ -25,29 +24,9 @@ class HistoryController:
             self.__log.info("History place changed to %s", placename)
             self.__placename = placename
 
-    @property
-    def screen(self):
-        if len(self.__screen) > 0:
-            return self.__screen[0]
-        return self.__screen
-
-    @screen.setter
-    def screen(self, next):
-        if next not in self.__screen:
-            self.__screen.append(next)
-
-    def back(self):
-        self.__screen = self.__screen[:-1]
-
-    def screen_manager(self):
-        if len(self.__screen) == 0:
-            return 0
-        elif self.screen == "main_character_screen":
-            self.main_character_screen()
-            self.screen_manager()
-
     def start_game(self):
-        return self.screen_manager()
+        self.__screen_controller.screen = "exploration"
+        self.start_adventure()
         # self.__log.info("Starting menu")
         # text = "Start menu\n"
         # start = lambda: self.start_adventure()
@@ -70,9 +49,8 @@ class HistoryController:
         #     return 0
 
     def main_character_screen(self):
-        self.screen = "main_character_screen"
         players = self.__player_controller.players
-        return self.__screen_controller.main_character_screen(players, self.__player, self.__character)
+        return self.__screen_controller.screen_manager(players=players, player=self.__player, character=self.__character)
 
     def select(self, player, char):
         self.__player = player
@@ -94,7 +72,7 @@ class HistoryController:
         
         if not self.__player or self.__character.dead:
             self.__log.info("No player detected for this game or character is dead. Redirecting to player creation/selection screen.")
-            self.create_select_screen()
+            self.main_character_screen()
 
         self.reset_adventure()
         self.__character.reset()
@@ -110,7 +88,7 @@ class HistoryController:
         if player:
             self.__character = player.character(char_name)
             self.__player = player
-            return player
+            return player, player.character(char_name)
 
 
     # def list_created(self):
@@ -157,6 +135,14 @@ class HistoryController:
         if self.__player and self.__player.name == name:
             self.__player = None
             self.__character = None
+
+    def remove_char(self, player, char):
+        self.__log.info("Removing char %s from player %s", player.name, char.name)
+        self.__player_controller.remove_char(player, char)
+        if self.__character and self.__character.name == char.name:
+            self.__character = None
+        if self.__player and not self.__player_controller.exists_player(player.name):
+            self.__player = None
 
     def death(self):
         self.__log.info("End game")

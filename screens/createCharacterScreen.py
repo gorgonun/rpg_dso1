@@ -12,7 +12,7 @@ class CreateCharacterScreen(Screen):
     def log(self):
         return self.__log
 
-    def start(self):
+    def start(self, player=None, char=None):
         layout = [
             [sg.Text("Create a character")],
             [sg.Text("Name", size=(14, 1)), sg.Input(enable_events=True, key="player_name")],
@@ -22,6 +22,10 @@ class CreateCharacterScreen(Screen):
         ]
 
         window = sg.Window("Character Creation", layout=layout, **self.screen_configs).Finalize()
+        if player and char:
+            window.Element("player_name").Update(player)
+            window.Element("player_age").Update(player.age)
+            window.Element("char_name").Update(char)
         window.Maximize()
 
         def func_screen(window):
@@ -38,6 +42,8 @@ class CreateCharacterScreen(Screen):
             elif event == "player_age":
                 if len(values["player_age"]) > 0 and not self.validate_number(values["player_age"][-1]):
                     window.Element("player_age").Update(values["player_age"][:-1])
+            elif event == "Cancel":
+                return False, None
         
         return self.execute_screen(func_screen, window)
 
