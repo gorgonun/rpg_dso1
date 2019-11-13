@@ -1,5 +1,6 @@
 from screen import Screen
 import PySimpleGUI as sg
+import math
 
 class ExplorerScreen(Screen):
     
@@ -12,9 +13,9 @@ class ExplorerScreen(Screen):
 
     def start(self, text, commands):
         layout = [
-            [sg.Text(text, key="top")],
-            [sg.Text("", key="commands")],
-            [sg.Input(enable_events=True, key="command")]
+            [sg.Text(text, size=(self.rows, math.floor((self.columns/6 * 3))), key="top")],
+            [sg.Text("", size=(self.rows, math.floor(self.columns/6 * 2)), key="commands")],
+            [sg.Input(enable_events=True, size=(self.rows, math.floor(self.columns/6 * 1)), key="command")]
         ]
 
         window = sg.Window("Explorer screen", layout=layout, **self.screen_configs).Finalize()
@@ -26,9 +27,9 @@ class ExplorerScreen(Screen):
             if values["command"] in commands:
                 return False, values["command"]
             elif values["command"] == "?":
-                window.Element("commands").Update("\n".join(commands))
+                window.Element("commands").Update(" | ".join(commands))
 
-        self.execute_screen(func_screen, window)
+        return self.execute_screen(func_screen, window)
 
     def show_text(self, text):
         self.print_wait_confimation(text)
