@@ -1,6 +1,6 @@
 from screen import Screen
 import PySimpleGUI as sg
-import math
+
 
 class ExplorerScreen(Screen):
     
@@ -13,33 +13,27 @@ class ExplorerScreen(Screen):
 
     def start(self, text, commands):
         layout = [
-            [sg.Text(text, size=(self.rows, math.floor((self.columns/6 * 3))), key="top")],
-            [sg.Text("", size=(self.rows, math.floor(self.columns/6 * 2)), key="commands")],
-            [sg.Input(enable_events=True, size=(self.rows, math.floor(self.columns/6 * 1)), key="command")]
+            [sg.Text(text, **self.centralize(20), key="top", justification="center")],
+            [sg.Text("", **self.centralize(5), key="commands")],
+            [sg.Input(enable_events=True, size=(self.columns, 1), key="command")],
+            [sg.Button("Continue", key="continue")]
         ]
 
         window = sg.Window("Explorer screen", layout=layout, **self.screen_configs).Finalize()
+        window.Element("continue").Update(visible=False)
         window.Element("command").SetFocus()
         window.Maximize()
 
-        def func_screen(window):
+        def func_screen(window, commands):
             event, values = window.Read()
-            if values["command"] in commands:
-                return False, values["command"]
+            if event == "continue":
+                return False, values["command"].replace(" ", "_")
+            elif values["command"] in commands.keys():
+                window.Element("command").Update(visible=False)
+                window.Element("top").Update(commands[values["command"]]["consequence"])
+                window.Element("continue").Update(visible=True)
             elif values["command"] == "?":
-                window.Element("commands").Update(" | ".join(commands))
+                window.Element("commands").Update(" | ".join(commands.keys()))
 
-        return self.execute_screen(func_screen, window)
+        return self.execute_screen(func_screen, window, commands)
 
-    def show_text(self, text):
-        self.print_wait_confimation(text)
-
-    # def get_action(self, text:str, commands: list):
-    #     output_dict = {
-    #         key: {
-    #             "f": lambda key: key,
-    #             "args": [key]
-    #         }
-    #          for key in commands
-    #          }
-    #     return self.get_adventure_input(text, output_dict)

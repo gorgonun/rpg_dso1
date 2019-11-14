@@ -31,7 +31,7 @@ class PlaceController():
 
         self.__log.info("Start doing action %s", action)
 
-        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=consequences["place_instance"], transition_text=char_update["consequence"], key_decision=char_update["key_decision"])
+        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=consequences["place_instance"], key_decision=char_update["key_decision"])
 
         self.__path = self.map_keys(self.__flux, consequences["next_place"])
         place_instance = consequences.get("place_instance")
@@ -41,7 +41,7 @@ class PlaceController():
             self.__place = self.get_instance(self.__main_controller.placename)()
 
     def explore(self):
-        action = self.__main_controller.get_action(self.text, self.__place.commands).replace(" ", "_")
+        action = self.__main_controller.get_action(self.text, {key: self.__path["data"][key.replace(" ", "_")] for key in self.__place.commands.keys()})
         self.__log.info("Got action %s", action)
         return self.do_action(action)
 

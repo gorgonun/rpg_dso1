@@ -14,13 +14,13 @@ class ScreenController():
         self.__ranking_screen = RankingScreen(log)
         self.__create_character_screen = CreateCharacterScreen(log)
         self.__main_controller = main_controller
-        self.__screen = ["main_character_screen"]
+        self.__screen = []
 
     @property
     def screen(self):
         if len(self.__screen) > 0:
-            return self.__screen[0]
-        return self.__screen
+            return self.__screen[-1]
+        return self.__screen[0]
 
     @screen.setter
     def screen(self, next):
@@ -36,19 +36,27 @@ class ScreenController():
     def screen_manager(self, **kwargs):
         if len(self.__screen) == 0:
             return 0
-        elif self.screen == "main_character_screen":
+        elif self.screen == "main_character":
             return self.main_character_screen(**kwargs)
-
-    def show_text(self, text: str):
-        self.__explorer_screen.show_text(text)
+        elif self.screen == "exploration":
+            return self.__main_controller.start_adventure()
 
     def get_action(self, text: str, commands: list):
         return self.__explorer_screen.start(text, commands)
 
-    def start_screen(self, text, menu):
-        return self.__start_screen.start(text, menu)
+    def start_screen(self):
+        self.screen = "start"
+        screen = self.__start_screen.start()
+        if screen == "start":
+            self.screen = "exploration"
+        elif screen == "manager":
+            self.screen = "main_character"
+        else:
+            self.back()
+        return self.screen_manager()
 
-    def main_character_screen(self, players: list, player, character):
+    def main_character_screen(self):
+        players, player, character = self.__main_controller.main_character_screen()
         result = self.__character_creation_screen.start(players, player, character)
         if result in (None, "Exit") or not result["option"]:
             return self.back()
@@ -71,9 +79,6 @@ class ScreenController():
             before_creation(*args)
         return self.__main_controller.create_character(**char)
 
-    def create_select_screen(self):
-        return self.__character_creation_screen.create_select()
-
     def is_valid_player(self, name):
         return self.__main_controller.is_valid_player(name)
 
@@ -85,9 +90,6 @@ class ScreenController():
 
     def remove_player(self, name):
         return self.__main_controller.remove_player(name)
-
-    def edit(self):
-        return self.__character_creation_screen.edit()
 
     def show_ranking(self, players_dict: dict):
         return self.__ranking_screen.show_ranking(players_dict)

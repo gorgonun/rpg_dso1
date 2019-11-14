@@ -32,5 +32,5 @@ class Village(Place):
 
     @property
     def commands(self):
-        return self.__states[self.state].keys()
+        return self.__states[self.state]
 

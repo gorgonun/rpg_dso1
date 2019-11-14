@@ -25,8 +25,9 @@ class HistoryController:
             self.__placename = placename
 
     def start_game(self):
-        self.__screen_controller.screen = "exploration"
-        self.start_adventure()
+        return self.__screen_controller.start_screen()
+        # self.__screen_controller.screen = "exploration"
+        # self.start_adventure()
         # self.__log.info("Starting menu")
         # text = "Start menu\n"
         # start = lambda: self.start_adventure()
@@ -50,29 +51,18 @@ class HistoryController:
 
     def main_character_screen(self):
         players = self.__player_controller.players
-        return self.__screen_controller.screen_manager(players=players, player=self.__player, character=self.__character)
+        return players, self.__player, self.__character
 
     def select(self, player, char):
         self.__player = player
         self.__character = char
-
-    def create_select_screen(self):
-        result = self.__screen_controller.create_select_screen()
-
-        if not result:
-            self.__log.info("Got no result while searching for char")
-            return self.create_character()
-
-        result = self.__player_controller.select(player_name=result[0], char_name=result[1])
-        self.__player = result[0]
-        self.__character = result[1]
 
     def start_adventure(self):
         self.__log.info("Starting game")
         
         if not self.__player or self.__character.dead:
             self.__log.info("No player detected for this game or character is dead. Redirecting to player creation/selection screen.")
-            self.main_character_screen()
+            self.__screen_controller.main_character_screen()
 
         self.reset_adventure()
         self.__character.reset()
@@ -90,30 +80,16 @@ class HistoryController:
             self.__player = player
             return player, player.character(char_name)
 
-
-    # def list_created(self):
-    #     self.__log.info("Showing created characters")
-    #     players = self.__player_controller.players
-    #     self.__screen_controller.list_created(players)
-
-    def edit(self):
-        self.__log.info("At edit screen")
-        self.__screen_controller.edit()
-
     def show_ranking(self):
         self.__log.info("Showing ranking")
         players = self.__player_controller.complete_players
         player_dict = {key: value["characters"] for key, value in players.items()}
         self.__screen_controller.show_ranking(player_dict)
 
-    def show_text(self, text: str):
-        self.__screen_controller.show_text(text)
-
     def get_action(self, text: str, commands: list):
         return self.__screen_controller.get_action(text, commands)
 
-    def update_game(self, death: bool, carma: int, transition_text: str, new_place: str, key_decision: str):
-        self.show_text(transition_text)
+    def update_game(self, death: bool, carma: int, new_place: str, key_decision: str):
         self.placename = new_place
         self.__character.carma = carma
         self.__character.dead = death

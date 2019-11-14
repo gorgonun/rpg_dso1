@@ -15,9 +15,9 @@ class CreateCharacterScreen(Screen):
     def start(self, player=None, char=None):
         layout = [
             [sg.Text("Create a character")],
-            [sg.Text("Name", size=(14, 1)), sg.Input(enable_events=True, key="player_name")],
-            [sg.Text("Age", size=(14, 1)), sg.Input(enable_events=True, key="player_age")],
-            [sg.Text("Character name", size=(14, 1)), sg.Input(enable_events=True, key="char_name")],
+            [sg.Text("Name", size=(20, 1)), sg.Input(enable_events=True, **self.centralize(), key="player_name")],
+            [sg.Text("Age", size=(20, 1)), sg.Input(enable_events=True, **self.centralize(), key="player_age")],
+            [sg.Text("Character name", size=(20, 1)), sg.Input(enable_events=True, **self.centralize(), key="char_name")],
             [sg.Submit(), sg.Button("Cancel")]
         ]
 
