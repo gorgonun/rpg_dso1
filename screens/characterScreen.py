@@ -15,7 +15,7 @@ class CharacterScreen(Screen):
 
     def start(self, players: list, player, character):
         layout = [
-            [sg.Text("Player: ", key="actual_player_name"), sg.Text("Character: ", key="actual_char_name")],
+            [sg.Text("Player: ", key="actual_player_name"), sg.Text("Age: ", key="actual_age"), sg.Text("Character: ", key="actual_char_name")],
             [sg.Text("Players")],
             [sg.Listbox(values=players, enable_events=True, key="player", size=(20, 20)), sg.Listbox(values=[], enable_events=True, size=(20, 20), key="char")],
             [sg.Button('Select'), sg.Button('Create'), sg.Button('Edit'), sg.Button('Remove'), sg.Button('Exit')]
@@ -25,6 +25,7 @@ class CharacterScreen(Screen):
         window.Element("char").Update(visible=False)
         window.Element("actual_player_name").Update(visible=False)
         window.Element("actual_char_name").Update(visible=False)
+        window.Element("actual_age").Update(visible=False)
         window.Maximize()
 
         def func_screen(window):
@@ -38,6 +39,8 @@ class CharacterScreen(Screen):
                 window.Element("actual_char_name").Update(player.name)
                 window.Element("actual_player_name").Update(visible=True)
                 window.Element("actual_player_name").Update(character.name)
+                window.Element("actual_age").Update(visible=True)
+                window.Element("actual_age").Update(player.age)
             event, values = window.Read()
             if event == "player" and len(values["player"]) > 0:
                 window.Element("char").Update(values['player'][0].characters)

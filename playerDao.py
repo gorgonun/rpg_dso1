@@ -47,3 +47,6 @@ class PlayerDao(Dao):
         self.object_cache[old_name]["player"].age = new_age
         self.object_cache[new_name] = self.object_cache.pop(old_name)
         self.update()
+
+    def save(self):
+        self.update()

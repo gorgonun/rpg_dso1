@@ -34,6 +34,9 @@ class PlayerController:
         self.__log.info("Checking if it has players")
         return len(self.__player_dao.get_all()) > 0
 
+    def save(self):
+        self.__player_dao.save()
+
     def update_player(self, old_name, new_name, new_age):
         self.__player_dao.update_player(old_name, new_name, new_age)
 
@@ -63,7 +66,7 @@ class PlayerController:
         char = Character(char_name)
         player = self.__player_dao.get(player_name)
 
-        if player and self.__player_dao.get(player_name).age == player_age:
+        if player and player.age == player_age:
             try:
                 self.__player_dao.add_char(player, char)
             except CharacterAlreadyExistsError:

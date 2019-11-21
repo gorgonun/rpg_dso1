@@ -26,28 +26,6 @@ class HistoryController:
 
     def start_game(self):
         return self.__screen_controller.start_screen()
-        # self.__screen_controller.screen = "exploration"
-        # self.start_adventure()
-        # self.__log.info("Starting menu")
-        # text = "Start menu\n"
-        # start = lambda: self.start_adventure()
-        # create = lambda: self.create_character()
-        # list_created = lambda: self.list_created()
-        # ranking = lambda: self.show_ranking()
-        # edit = lambda: self.edit()
-        # exit_f = lambda: "exit"
-        # menu = [("Start game", start), ("Create character", create)]
-        
-        # if self.__player_controller.has_players:
-        #     menu.append(("List players created", list_created))
-        #     menu.append(("Edit players", edit))
-        #     menu.append(("Show ranking", ranking))
-
-        # menu.append(("Exit", exit_f))
-        # result = self.__screen_controller.start_screen(text, menu)
-
-        # if result == "exit":
-        #     return 0
 
     def main_character_screen(self):
         players = self.__player_controller.players
@@ -65,15 +43,16 @@ class HistoryController:
             self.__screen_controller.main_character_screen()
 
         self.reset_adventure()
-        self.__character.reset()
         self.__place_controller.reset()
-        
-        while not self.__character.dead:
-            self.__place_controller.explore()
-        self.death()
 
-    def create_character(self, player_name: str, player_age: int, char_name: str):
-        player = self.__player_controller.create_character(player_name=player_name, player_age=player_age, char_name=char_name)
+        while not self.__character.dead and self.__screen_controller.screen == "exploration":
+            self.__place_controller.explore()
+        if self.__character.dead:
+            self.__screen_controller.back()
+            self.death()
+
+    def create_character(self, player_name: str, player_age: str, char_name: str):
+        player = self.__player_controller.create_character(player_name=player_name, player_age=int(player_age), char_name=char_name)
 
         if player:
             self.__character = player.character(char_name)
@@ -83,7 +62,7 @@ class HistoryController:
     def show_ranking(self):
         self.__log.info("Showing ranking")
         players = self.__player_controller.complete_players
-        player_dict = {key: value["characters"] for key, value in players.items()}
+        player_dict = {key: value.characters for key, value in players.items()}
         self.__screen_controller.show_ranking(player_dict)
 
     def get_action(self, text: str, commands: list):
@@ -95,6 +74,7 @@ class HistoryController:
         self.__character.dead = death
         if key_decision:
             self.__character.key_decisions = key_decision
+        self.__player_controller.save()
 
     def is_valid_player(self, name: str):
         return self.__player_controller.exists_player(name)
@@ -105,10 +85,10 @@ class HistoryController:
     def update_player(self, old_name: str, new_name: str, new_age: str):
         self.__player_controller.update_player(old_name, new_name, new_age)
 
-    def remove_player(self, player):
-        self.__log.info("Removing player %s", player.name)
-        self.__player_controller.remove_player(player)
-        if self.__player and self.__player.name == player.name:
+    def remove_player(self, name: str):
+        self.__log.info("Removing player %s", name)
+        self.__player_controller.remove_player(name)
+        if self.__player and self.__player.name == name:
             self.__player = None
             self.__character = None
 
@@ -128,6 +108,8 @@ class HistoryController:
         self.placename = "forest"
         self.__place_controller = PlaceController(self, self.__log)
         self.__screen_controller = ScreenController(self, self.__log)
+        self.__screen_controller.screen = "start"
+        self.__screen_controller.screen = "exploration"
         self.__log.info("Reset complete")
 
     def test_mode(self):

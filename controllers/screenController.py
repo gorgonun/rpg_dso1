@@ -40,9 +40,14 @@ class ScreenController():
             return self.main_character_screen(**kwargs)
         elif self.screen == "exploration":
             return self.__main_controller.start_adventure()
+        elif self.screen == "show_ranking":
+            return self.__main_controller.show_ranking(**kwargs)
 
     def get_action(self, text: str, commands: list):
-        return self.__explorer_screen.start(text, commands)
+        action = self.__explorer_screen.start(text, commands)
+        if action == "return":
+            return self.back()
+        return action
 
     def start_screen(self):
         self.screen = "start"
@@ -51,11 +56,14 @@ class ScreenController():
             self.screen = "exploration"
         elif screen == "manager":
             self.screen = "main_character"
+        elif screen == "ranking":
+            self.screen = "show_ranking"
         else:
             self.back()
         return self.screen_manager()
 
     def main_character_screen(self):
+        self.screen = "main_character"
         players, player, character = self.__main_controller.main_character_screen()
         result = self.__character_creation_screen.start(players, player, character)
         if result in (None, "Exit") or not result["option"]:
@@ -91,5 +99,6 @@ class ScreenController():
     def remove_player(self, player):
         return self.__main_controller.remove_player(player)
 
-    def show_ranking(self, players_dict: dict):
-        return self.__ranking_screen.show_ranking(players_dict)
+    def show_ranking(self, players_dict):
+        self.__ranking_screen.start(players_dict)
+        return self.back()

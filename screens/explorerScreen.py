@@ -16,7 +16,7 @@ class ExplorerScreen(Screen):
             [sg.Text(text, **self.centralize(20), key="top", justification="center")],
             [sg.Text("", **self.centralize(5), key="commands")],
             [sg.Input(enable_events=True, size=(self.columns, 1), key="command")],
-            [sg.Button("Continue", key="continue")]
+            [sg.Button("Continue", key="continue"), sg.Button("Return", key="return")]
         ]
 
         window = sg.Window("Explorer screen", layout=layout, **self.screen_configs).Finalize()
@@ -25,6 +25,7 @@ class ExplorerScreen(Screen):
         window.Maximize()
 
         def func_screen(window, commands):
+            window.Element("return").Update(visible=True)
             event, values = window.Read()
             if event == "continue":
                 return False, values["command"].replace(" ", "_")
@@ -32,8 +33,11 @@ class ExplorerScreen(Screen):
                 window.Element("command").Update(visible=False)
                 window.Element("top").Update(commands[values["command"]]["consequence"])
                 window.Element("continue").Update(visible=True)
+                window.Element("return").Update(visible=False)
             elif values["command"] == "?":
                 window.Element("commands").Update(" | ".join(commands.keys()))
+            elif event == "return":
+                return False, event
 
         return self.execute_screen(func_screen, window, commands)
 

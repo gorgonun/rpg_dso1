@@ -13,9 +13,10 @@ class StartScreen(Screen):
 
     def start(self):
         layout = [
-            [sg.Button("Start game", key="start")],
-            [sg.Button("Player manager", key="manager")],
-            [sg.Button("Exit")]
+            [sg.Button("Start game", key="start", **self.centralize())],
+            [sg.Button("Player manager", key="manager", **self.centralize())],
+            [sg.Button("Show ranking", key="ranking", **self.centralize())],
+            [sg.Button("Exit", **self.centralize())]
         ]
 
         window = sg.Window("Start", layout=layout, **self.screen_configs).Finalize()

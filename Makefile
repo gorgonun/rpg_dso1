@@ -26,3 +26,8 @@ run-pc:
 
 run-test:
 	- python3 start.py test
+
+deploy:
+	- rm -rf dist && \
+		source venv/bin/activate && \
+        pyinstaller start.py
