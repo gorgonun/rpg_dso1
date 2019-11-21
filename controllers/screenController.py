@@ -29,7 +29,7 @@ class ScreenController():
 
     def back(self):
         self.__screen = self.__screen[:-1]
-        if not self.screen:
+        if not self.__screen:
             return 0
         self.screen_manager()
 
@@ -67,7 +67,7 @@ class ScreenController():
         elif result["option"] == "Edit":
             self.create_character(result["values"]["player"], result["values"]["char"], self.__main_controller.remove_char, result["values"]["player"], result["values"]["char"])
         elif result["option"] == "Remove player":
-            self.__main_controller.remove_player(result["values"]["player"].name)
+            self.__main_controller.remove_player(result["values"]["player"])
         elif result["option"] == "Remove character":
             self.__main_controller.remove_char(result["values"]["player"], result["values"]["char"])
 
@@ -88,8 +88,8 @@ class ScreenController():
     def update_player(self, old_name: str, new_name: str, new_age: int):
         return self.__main_controller.update_player(old_name, new_name, new_age)
 
-    def remove_player(self, name):
-        return self.__main_controller.remove_player(name)
+    def remove_player(self, player):
+        return self.__main_controller.remove_player(player)
 
     def show_ranking(self, players_dict: dict):
         return self.__ranking_screen.show_ranking(players_dict)

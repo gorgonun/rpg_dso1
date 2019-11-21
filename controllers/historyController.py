@@ -105,10 +105,10 @@ class HistoryController:
     def update_player(self, old_name: str, new_name: str, new_age: str):
         self.__player_controller.update_player(old_name, new_name, new_age)
 
-    def remove_player(self, name: str):
-        self.__log.info("Removing player %s", name)
-        self.__player_controller.remove_player(name)
-        if self.__player and self.__player.name == name:
+    def remove_player(self, player):
+        self.__log.info("Removing player %s", player.name)
+        self.__player_controller.remove_player(player)
+        if self.__player and self.__player.name == player.name:
             self.__player = None
             self.__character = None
 

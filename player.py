@@ -33,6 +33,9 @@ class Player:
     def characters(self):
         return list(self.__characters.values())
 
+    def remove(self, char):
+        self.__characters.pop(char.name)
+
     def character(self, name):
         return self.__characters.get(name)
 

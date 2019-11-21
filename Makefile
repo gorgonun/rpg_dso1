@@ -25,5 +25,4 @@ run-pc:
 		python start.py
 
 run-test:
-	-source venv/bin/activate && \
-		python start.py test
+	- python3 start.py test
