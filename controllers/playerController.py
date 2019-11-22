@@ -1,5 +1,6 @@
 from character import Character
-from player import Player, CharacterAlreadyExistsError
+from player import Player
+from exceptions import CharacterAlreadyExistsError
 import string
 import random
 from playerDao import PlayerDao
@@ -38,7 +39,10 @@ class PlayerController:
         self.__player_dao.save()
 
     def update_player(self, old_name, new_name, new_age):
-        self.__player_dao.update_player(old_name, new_name, new_age)
+        self.__player_dao.get_dict()[old_name]["player"].name = new_name
+        self.__player_dao.get_dict()[old_name]["player"].age = new_age
+        self.__player_dao.get_dict()[new_name] = self.__player_dao.get_dict().pop(old_name)
+        self.__player_dao.save()
 
     def remove_player(self, player):
         self.__player_dao.remove_player(player)

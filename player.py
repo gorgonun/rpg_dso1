@@ -1,5 +1,4 @@
-class CharacterAlreadyExistsError(Exception):
-    pass
+from exceptions import CharacterAlreadyExistsError
 
 class Player:
 

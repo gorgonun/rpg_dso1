@@ -18,6 +18,7 @@ class ScreenController():
 
     @property
     def screen(self):
+        print(self.__screen)
         if len(self.__screen) > 0:
             return self.__screen[-1]
         return self.__screen[0]
@@ -42,6 +43,8 @@ class ScreenController():
             return self.__main_controller.start_adventure()
         elif self.screen == "show_ranking":
             return self.__main_controller.show_ranking(**kwargs)
+        elif self.screen == "start":
+            return self.start_screen()
 
     def get_action(self, text: str, commands: list):
         action = self.__explorer_screen.start(text, commands)

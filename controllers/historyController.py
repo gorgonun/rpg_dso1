@@ -2,6 +2,8 @@ from controllers.placeController import PlaceController
 from controllers.screenController import ScreenController
 from controllers.playerController import PlayerController
 from logging import Logger
+from exceptions import CannotStartGameError
+
 
 class HistoryController:
 
@@ -35,10 +37,16 @@ class HistoryController:
         self.__player = player
         self.__character = char
 
+    def check_player_status(self):
+        if not self.__player or self.__character.dead:
+            raise CannotStartGameError
+
     def start_adventure(self):
         self.__log.info("Starting game")
-        
-        if not self.__player or self.__character.dead:
+
+        try:
+            self.check_player_status()
+        except CannotStartGameError:
             self.__log.info("No player detected for this game or character is dead. Redirecting to player creation/selection screen.")
             self.__screen_controller.main_character_screen()
 

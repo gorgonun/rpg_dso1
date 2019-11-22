@@ -42,11 +42,5 @@ class PlayerDao(Dao):
             self.remove_player(player)
         self.update()
 
-    def update_player(self, old_name, new_name, new_age):
-        self.object_cache[old_name]["player"].name = new_name
-        self.object_cache[old_name]["player"].age = new_age
-        self.object_cache[new_name] = self.object_cache.pop(old_name)
-        self.update()
-
     def save(self):
         self.update()
