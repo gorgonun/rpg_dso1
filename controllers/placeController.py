@@ -1,7 +1,5 @@
 from places import forest, village
 from flux import flux
-from place import Place
-from screens import explorerScreen
 from logging import Logger
 
 class PlaceNotFoundException(Exception):
@@ -26,12 +24,14 @@ class PlaceController():
         self.__place = self.get_instance(self.__main_controller.placename)()
 
     def do_action(self, action: str):
+        if not action:
+            return
         consequences = getattr(self.__place, action)()
         char_update = self.__path["data"][action]
 
         self.__log.info("Start doing action %s", action)
 
-        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=consequences["place_instance"], transition_text=char_update["consequence"], key_decision=char_update["key_decision"])
+        self.__main_controller.update_game(death=char_update["dead"], carma=char_update["carma"], new_place=consequences["place_instance"], key_decision=char_update["key_decision"])
 
         self.__path = self.map_keys(self.__flux, consequences["next_place"])
         place_instance = consequences.get("place_instance")
@@ -41,9 +41,10 @@ class PlaceController():
             self.__place = self.get_instance(self.__main_controller.placename)()
 
     def explore(self):
-        action = self.__main_controller.get_action(self.text, self.__place.commands).replace(" ", "_")
+        action = self.__main_controller.get_action(self.text, {key: self.__path["data"][key.replace(" ", "_")] for key in self.__place.commands.keys()})
         self.__log.info("Got action %s", action)
-        return self.do_action(action)
+        if action:
+            return self.do_action(action)
 
     def map_keys(self, original_dict: dict, list_map: list):
         place = original_dict

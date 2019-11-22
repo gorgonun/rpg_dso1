@@ -1,5 +1,4 @@
-class CharacterAlreadyExistsError(Exception):
-    pass
+from exceptions import CharacterAlreadyExistsError
 
 class Player:
 
@@ -33,5 +32,14 @@ class Player:
     def characters(self):
         return list(self.__characters.values())
 
+    def remove(self, char):
+        self.__characters.pop(char.name)
+
     def character(self, name):
         return self.__characters.get(name)
+
+    def __len__(self):
+        return len(self.__name)
+
+    def __str__(self):
+        return self.__name

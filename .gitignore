@@ -5,3 +5,7 @@ venv/
 .idea
 *.egg-info/
 *.pyc
+build/
+dist/
+start.spec
+players.pickle

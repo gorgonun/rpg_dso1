@@ -2,6 +2,8 @@ from controllers.placeController import PlaceController
 from controllers.screenController import ScreenController
 from controllers.playerController import PlayerController
 from logging import Logger
+from exceptions import CannotStartGameError
+
 
 class HistoryController:
 
@@ -25,97 +27,67 @@ class HistoryController:
             self.__placename = placename
 
     def start_game(self):
-        self.__log.info("Starting menu")
-        text = "Start menu\n"
-        start = lambda: self.start_adventure()
-        create = lambda: self.create_character()
-        list_created = lambda: self.list_created()
-        ranking = lambda: self.show_ranking()
-        edit = lambda: self.edit()
-        exit_f = lambda: "exit"
-        menu = [("Start game", start), ("Create character", create)]
-        
-        if self.__player_controller.has_players:
-            menu.append(("List players created", list_created))
-            menu.append(("Edit players", edit))
-            menu.append(("Show ranking", ranking))
+        return self.__screen_controller.start_screen()
 
-        menu.append(("Exit", exit_f))
-        result = self.__screen_controller.start_screen(text, menu)
+    def main_character_screen(self):
+        players = self.__player_controller.players
+        return players, self.__player, self.__character
 
-        if result == "exit":
-            return 0
+    def select(self, player, char):
+        self.__player = player
+        self.__character = char
 
-    def create_select_screen(self):
-        result = self.__screen_controller.create_select_screen()
-
-        if not result:
-            self.__log.info("Got no result while searching for char")
-            return self.create_character()
-
-        result = self.__player_controller.select(player_name=result[0], char_name=result[1])
-        self.__player = result[0]
-        self.__character = result[1]
+    def check_player_status(self):
+        if not self.__player or self.__character.dead:
+            raise CannotStartGameError
 
     def start_adventure(self):
         self.__log.info("Starting game")
-        
-        if not self.__player or self.__character.dead:
+
+        try:
+            self.check_player_status()
+        except CannotStartGameError:
             self.__log.info("No player detected for this game or character is dead. Redirecting to player creation/selection screen.")
-            self.create_select_screen()
+            self.__screen_controller.main_character_screen()
 
         self.reset_adventure()
-        self.__character.reset()
         self.__place_controller.reset()
-        
-        while not self.__character.dead:
+
+        while not self.__character.dead and self.__screen_controller.screen == "exploration":
             self.__place_controller.explore()
-        self.death()
+        if self.__character.dead:
+            self.__screen_controller.back()
+            self.death()
 
-    def create_character(self):
-        result = self.__screen_controller.create_character()
-        player = self.__player_controller.create_character(player_name=result[0], player_age=result[1], char_name=result[2])
-        
+    def create_character(self, player_name: str, player_age: str, char_name: str):
+        player = self.__player_controller.create_character(player_name=player_name, player_age=int(player_age), char_name=char_name)
+
         if player:
-            self.__character = player.character(result[2])
+            self.__character = player.character(char_name)
             self.__player = player
-        
-        else:
-            self.show_text("Could not create your player/character.")
-
-    def list_created(self):
-        self.__log.info("Showing created characters")
-        players = self.__player_controller.players
-        self.__screen_controller.list_created(players)
-
-    def edit(self):
-        self.__log.info("At edit screen")
-        self.__screen_controller.edit()
+            return player, player.character(char_name)
 
     def show_ranking(self):
         self.__log.info("Showing ranking")
         players = self.__player_controller.complete_players
-        player_dict = {key: value["characters"] for key, value in players.items()}
+        player_dict = {key: value.characters for key, value in players.items()}
         self.__screen_controller.show_ranking(player_dict)
-
-    def show_text(self, text: str):
-        self.__screen_controller.show_text(text)
 
     def get_action(self, text: str, commands: list):
         return self.__screen_controller.get_action(text, commands)
 
-    def update_game(self, death: bool, carma: int, transition_text: str, new_place: str, key_decision: str):
-        self.show_text(transition_text)
+    def update_game(self, death: bool, carma: int, new_place: str, key_decision: str):
         self.placename = new_place
         self.__character.carma = carma
         self.__character.dead = death
         if key_decision:
             self.__character.key_decisions = key_decision
+        self.__player_controller.save()
 
-    def check_if_exists_player(self, name: str):
+    def is_valid_player(self, name: str):
         return self.__player_controller.exists_player(name)
 
-    def check_if_exists_char(self, player_name: str, char_name:str):
+    def is_valid_char(self, player_name: str, char_name:str):
         return self.__player_controller.exists_character(player_name=player_name, char_name=char_name)
     
     def update_player(self, old_name: str, new_name: str, new_age: str):
@@ -128,6 +100,14 @@ class HistoryController:
             self.__player = None
             self.__character = None
 
+    def remove_char(self, player, char):
+        self.__log.info("Removing char %s from player %s", player.name, char.name)
+        self.__player_controller.remove_char(player, char)
+        if self.__character and self.__character.name == char.name:
+            self.__character = None
+        if self.__player and not self.__player_controller.exists_player(player.name):
+            self.__player = None
+
     def death(self):
         self.__log.info("End game")
 
@@ -136,6 +116,8 @@ class HistoryController:
         self.placename = "forest"
         self.__place_controller = PlaceController(self, self.__log)
         self.__screen_controller = ScreenController(self, self.__log)
+        self.__screen_controller.screen = "start"
+        self.__screen_controller.screen = "exploration"
         self.__log.info("Reset complete")
 
     def test_mode(self):
